@@ -2,15 +2,16 @@
 require('dotenv').config();
 const express = require('express');
 const app = express();
-// const dotenv = require('dotenv');
-// const cors = require('cors');
 const mongoose = require('mongoose');
-const multer = require('multer');
+
+const multer = require("multer");
 const path = require('path');
+
+// const fileuploadRouter = require('./routes/fileUpload');
 
 const PORT = process.env.PORT || 3500;
 
-// imported file | step 2.1
+// connect DB step 2.1
 const connectDB = require('./config/dbConn');
 // const corsOptions = require('./config/corsOptions');
 
@@ -18,10 +19,11 @@ const connectDB = require('./config/dbConn');
 connectDB();
 
 // built in middleware | step 3
-app.use(express.json());
+app.use(express.json())
 
 // step 4 the image 
-app.use("/images", express.static(path.join(__dirname, "/images")));
+// app.use('/fileupload', fileuploadRouter);
+
 
 // step 2.2
 mongoose.connection.once('open', () => {
@@ -29,19 +31,23 @@ mongoose.connection.once('open', () => {
   app.listen(PORT, () => { console.log(`Server running on port ${PORT} `) });
 });
 
-// step 4.1 upload multer images
+// step 4.1 upload multer images folder and the name file saved
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "images")
+  destination: function (req, file, cb) {
+    cb(null, './images')
   },
-  filename: (req, file, cb) => {
-    //callb(null, "file.png")
-    cb(null, req.body.name)
-  },
+  filename:function(req,file,cb){
+    cb(null,file.originalname)
+  }
 })
-// step 4.2 upload image
 const upload = multer({ storage: storage })
-app.post("/upload", upload.single("file"), (req, res) => {
+
+// upload image then store to the image folder so the image accessible on webpage
+app.use(express.static(__dirname + '/images'));
+app.use('/images', express.static('images'));
+
+// Route to the upload single image
+app.post("/upload", upload.single("file"), function(req, res){
   res.status(200).json("File has been uploaded")
 })
 
