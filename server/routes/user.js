@@ -19,12 +19,12 @@ router.put('/:id', async (req, res) => {
         { $set: req.body },
         { new: true }
       )
-      res.sendStatus(200).json(updatedUser)
+      res.status(200).json(updatedUser)
     } catch (error) {
-      res.sendStatus(500).json(error)
+      res.status(500).json(error)
     }
   } else {
-    res.sendStatus(401).json({ "message": "Only update your account" })
+    res.status(401).json("only update your account")
   }
 });
 
@@ -41,26 +41,28 @@ router.delete("/:id", async (req, res) => {
         await Post.deleteMany({ username: foundUser.username })
 
         // delete user account
-        res.sendStatus(200).json({ "message": `user ${foundUser} has been deleted` })
+        res.status(200).json("User has been deleted...")
 
       } catch (error) {
-        res.sendStatus(500).json(error)
+        res.status(500).json(error)
       }
     } catch (error) {
       // if theres no user match
-      res.sendStatus(404).json({"message":"User not found"})
+      res.status(404).json("User not found")
     }
+  } else {
+    res.status(401).json("You can delete only your account")
   }
 });
 
 // get user information
-router.get('/:id',async(req,res)=>{
+router.get('/:id', async (req, res) => {
   try {
     const foundUser = await User.findById(req.params.id);
-    const {password, ...other} = foundUser._doc;
-    res.sendStatus(200).json(other);
+    const { password, ...other } = foundUser._doc;
+    res.status(200).json(other)
   } catch (error) {
-    res.sendStatus(400).json(error);
+    res.status(400).json(error)
   }
 })
 
